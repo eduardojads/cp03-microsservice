@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Delete } from "@mui/icons-material";
 
 export default function ListarPet() {
   const [pets, setPets] = useState<PetDTO[]>([]);
@@ -45,6 +47,27 @@ export default function ListarPet() {
     };
     fetchPets();
   }, []);
+
+  const handleDelete = async (id: number, nome:string) => {
+    if(window.confirm(`Tem certeza que deseja excluir o pet ${nome} do id: ${id}`)){
+      try{
+        await petService.deleteById(id);
+        setPets(pets.filter((pet) => pet.id !== id));
+        setSuccess("Pet excluído com sucesso!");
+        setTimeout(() => setSuccess(null), 2000);
+      }catch (error: unknown) {
+        let msg = "Erro ao excluir o Pet";
+
+        if (axios.isAxiosError(error) && error.response) {
+          msg = error.response.data.error || msg;
+        }
+        setSuccess(null);
+        setError(msg);
+        setTimeout(() => setError(null), 2000);
+      }
+    }
+    
+  }
 
   return (
     <Box sx={{ P: 4 }}>
@@ -105,6 +128,14 @@ export default function ListarPet() {
                     <TableCell>{pet.nome}</TableCell>
                     <TableCell>{pet.tipo}</TableCell>
                     <TableCell>{pet.cor}</TableCell>
+                    <TableCell>
+                      <IconButton
+                      aria-label="excluir"
+                      onClick={() => handleDelete(pet.id, pet.nome)}
+                      sx={{ ml: 1}}>
+                        <Delete/>
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

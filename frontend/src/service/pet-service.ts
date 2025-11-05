@@ -16,5 +16,11 @@ export async function save(pet: PetInputDTO): Promise<PetDTO> {
   return response.data;
 }
 
+export async function deleteById(id: number) {
+
+  await axios.delete(`${BASE_URL}/pets/${id}`);
+  
+}
+
 
 
